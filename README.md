@@ -9,7 +9,7 @@ When packaging Helm charts with many modules and subcharts, duplicate dependency
 ## Installation
 
 ```bash
-helm plugin install https://github.com/your-username/helm-optimize
+helm plugin install https://github.com/bansalgokul/helm-optimize
 ```
 
 ## Usage
