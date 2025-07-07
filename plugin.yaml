@@ -1,0 +1,8 @@
+name: "optimize"
+version: "0.1.0"
+usage: "Optimize Helm charts through various methods"
+description: "A Helm plugin to optimize Helm charts, including deduplication of dependencies to reduce package size"
+command: "$HELM_PLUGIN_DIR/bin/helm-optimize"
+hooks:
+  install: "cd $HELM_PLUGIN_DIR && scripts/install.sh"
+  update: "cd $HELM_PLUGIN_DIR && scripts/install.sh"
