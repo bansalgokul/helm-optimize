@@ -25,6 +25,7 @@ helping to improve performance, reduce size, and enhance usability.`,
 
 	// Add subcommands
 	rootCmd.AddCommand(NewDedupCmd())
+	rootCmd.AddCommand(NewCleanupCmd())
 
 	return rootCmd
 }

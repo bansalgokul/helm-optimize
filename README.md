@@ -29,11 +29,15 @@ helm optimize dedup CHART_PATH --package
 # Specify output directory
 helm optimize dedup CHART_PATH --output OUTPUT_DIR
 
+# Clean up unnecessary chart directories
+helm optimize cleanup CHART_PATH
+
 # View detailed information (global flag available to all commands)
 helm optimize --verbose dedup CHART_PATH
 
 # Dry run mode (show what would be done without making changes)
 helm optimize dedup CHART_PATH --dry-run --show-deleted
+helm optimize cleanup CHART_PATH --dry-run --show-deleted
 ```
 
 ## Features
@@ -41,6 +45,10 @@ helm optimize dedup CHART_PATH --dry-run --show-deleted
 ### Deduplication
 
 The `dedup` command analyzes the chart and its dependencies, identifying duplicate subchart references. It then restructures the chart to eliminate these duplications while maintaining all required functionality.
+
+### Cleanup
+
+The `cleanup` command performs a depth-first search on Helm charts, runs 'helm dep up' at the bottom-most level, and removes original directories for dependencies with 'repository: file:' format after the dependency charts are created. This helps maintain a cleaner chart structure.
 
 ## Extending the Plugin
 
