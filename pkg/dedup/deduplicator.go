@@ -110,22 +110,45 @@ func (d *Deduplicator) processDependencies(chartPath string) error {
 			if paths, found := d.overallDependencies[depKey]; found {
 				// Check if this is a true duplicate or a specialized version
 				isTrueDuplicate := false
+				var originalPath string
 				
 				// Basic rule: charts at the same level of hierarchy with the same parent are considered duplicates
 				// Charts in different parts of hierarchy should be preserved
 				for _, existingChartPath := range paths {
+					// Store original path for reference
+					if originalPath == "" {
+						originalPath = existingChartPath.Path
+					}
+					
+					// If exact same path, skip it entirely - this is not a duplicate but the same dependency
+					if existingChartPath.Path == depPath {
+						// This is the exact same path, not a duplicate
+						isTrueDuplicate = false
+						break
+					}
+					
+					// Check for duplicate at same parent level
 					if existingChartPath.ParentPath == parentPath {
 						isTrueDuplicate = true
-						break
 					}
 				}
 				
 				if isTrueDuplicate {
-					// Duplicate found - add to delete dependencies
-					d.deleteDependencies = append(d.deleteDependencies, depPath)
-					if d.opts.Verbose {
-						fmt.Printf("  Found duplicate dependency %s at %s (original at %s)\n", 
-							depKey, depPath, paths[0].Path)
+					// Duplicate found - but double check that we're not deleting the original path
+					if depPath != originalPath {
+						d.deleteDependencies = append(d.deleteDependencies, depPath)
+						if d.opts.Verbose {
+							fmt.Printf("  Found duplicate dependency %s at %s (original at %s)\n", 
+								depKey, depPath, originalPath)
+						}
+					} else {
+						// This is the original path, we shouldn't delete it
+						newChartPath := ChartPath{Path: depPath, ParentPath: parentPath}
+						d.overallDependencies[depKey] = append(paths, newChartPath)
+						d.currentDependencies = append(d.currentDependencies, depPath)
+						if d.opts.Verbose {
+							fmt.Printf("  Found original dependency %s at %s (keeping)\n", depKey, depPath)
+						}
 					}
 				} else {
 					// Similar dependency in different context - keep it
