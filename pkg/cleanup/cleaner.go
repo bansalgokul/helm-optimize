@@ -150,7 +150,18 @@ func (c *Cleaner) cleanupFileDependencies(chartPath string) error {
 			continue
 		}
 
-		// Directory exists, remove it
+		// Check if the immediate parent directory is named "charts"
+		// Skip deletion of directories that are direct children of a "charts" directory
+		// as they are part of the chart structure and should be preserved
+		parentDir := filepath.Base(filepath.Dir(originalDirPath))
+		if parentDir == "charts" {
+			if c.opts.Verbose {
+				fmt.Printf("Skipping directory %s - it's under charts/ directory (preserving chart structure)\n", originalDirPath)
+			}
+			continue
+		}
+
+		// Directory exists and does NOT have 'charts' as immediate parent, remove it
 		if c.opts.Verbose || c.opts.ShowDeleted {
 			fmt.Printf("Found file dependency directory: %s\n", originalDirPath)
 		}
